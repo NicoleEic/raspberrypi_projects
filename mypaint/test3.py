@@ -4,27 +4,33 @@ from skimage.data import astronaut
 from skimage.color import label2rgb
 from skimage import io
 from matplotlib import pyplot as plt
-from skimage.segmentation import felzenszwalb, slic, quickshift, watershed
+from skimage.segmentation import felzenszwalb, slic,  mark_boundaries, find_boundaries
 import numpy as np
+import skimage.color as color
 
+fname = 'fruit.jpg'
+img = io.imread(fname)
 
-# Setting the plot size as 15, 15
-plt.figure(figsize=(15,15))
-
-# Sample Image of scikit-image package
-# astronaut = astronaut()
-astronaut = io.imread('sunflower.jpeg')
-
-# Applying Simple Linear Iterative
 # Clustering on the image
-# - 50 segments & compactness = 10
-# astronaut_segments = slic(astronaut,
-# 						n_segments=10,
-# 						compactness=1)
-astronaut_segments = felzenszwalb(astronaut,
-                                  scale=1000,
-                                  sigma=1,
-                                  min_size=500)
+img_segments = felzenszwalb(img,
+                          scale=300,
+                          sigma=2,
+                          min_size=1000)
 
-plt.imshow(astronaut_segments)
+
+print(len(np.unique(img_segments)))
+plt.subplot(1, 2, 1)
+
+plt.imshow(color.label2rgb(img_segments, img, kind='avg'))
+
+plt.subplot(1, 2, 2)
+plt.imshow(find_boundaries(img_segments).astype(np.uint8))
+
 plt.show()
+
+cols = color.label2rgb(img_segments, img, kind='avg')
+cols = cols.reshape(-1, cols.shape[-1])
+cols = np.unique(cols, axis=0)
+
+
+print('done')
