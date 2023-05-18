@@ -8,6 +8,7 @@ from kivy.uix.button import Button
 from kivy.core.window import Window
 from kivy.properties import ListProperty, NumericProperty
 from kivy.graphics import *
+import numpy as np
 
 
 class MyBackground(Widget):
@@ -25,7 +26,7 @@ class MyPaintWidget(Widget):
         self.pencolor = (0, 0, 0, 1)
         bg = MyBackground()
         self.add_widget(bg)
-
+            
 
     def on_touch_down(self, touch):
         if not isinstance(touch, HIDMotionEvent):
@@ -47,6 +48,7 @@ class MyPaintApp(App):
     
     def build(self):
         parent = Widget()
+        self.imagefile = 'sunflower.jpeg'
         self.painter = MyPaintWidget(size=Window.size)
         parent.add_widget(self.painter)
         
@@ -62,14 +64,20 @@ class MyPaintApp(App):
         savebtn.bind(on_release=self.mysave)
         parent.add_widget(savebtn)
         
-        col_list = [(1,0,0,1), (0,1,0,1)]
-        
+        n_cols = 20
+        col_list = [tuple(np.random.rand(3)) + (1,) for i in np.arange(0,n_cols)]
+        btn_width = 20
+        btn_height = 50
+        if Window.width - (n_cols*btn_width+btn_width) < 0:
+            print('too many buttons')
+            self.myclose_empty()
+                  
         for i_c, col in enumerate(col_list):
             bt = Button(text='',
                         background_color=col,
                         background_normal='',
-                        size_hint=(None, None), size=(100, 50),
-                        pos=(Window.width - (i_c*100+100), Window.height - 100))
+                        size_hint=(None, None), size=(btn_width, btn_height),
+                        pos=(Window.width - (i_c*btn_width+btn_width), Window.height - 100))
             bt.bind(on_release=self.newclr)
             parent.add_widget(bt)
         
@@ -82,10 +90,12 @@ class MyPaintApp(App):
         self.painter.pencolor = newcol
         print(newcol)
 
-
-    def myclose(self, args):
+    def myclose_empty(self):
         self.stop()
         sys.exit()
+
+    def myclose(self, args):
+        self.myclose_empty()
         
     def clear_canvas(self, obj):
         self.painter.pencolor = (0,0,0,1)
@@ -94,6 +104,7 @@ class MyPaintApp(App):
     def mysave(self, obj):
         print('save')
         self.painter.export_as_image().save('image.jpg')
+        
 
 if __name__ == '__main__':
     MyPaintApp().run()
