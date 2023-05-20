@@ -1,43 +1,46 @@
-from random import random
 from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.slider import Slider
+
 from kivy.uix.widget import Widget
-from kivy.uix.button import Button
-from kivy.graphics import Color, Ellipse, Line
-from kivy.input.providers.hidinput import HIDMotionEvent
+from kivy.graphics import Rectangle, Color, Line
+
+from random import random
+
+class DrawingWidget(Widget):
+    def __init__(self):
+        super(DrawingWidget, self).__init__()
+
+        with self.canvas:
+            Color(1, 1, 1, 1)
+            self.rect = Rectangle(size=self.size,
+                                  pos=self.pos)
+            self.rect_colour = Color(1, 0, 0, 1)  # note that we must reset the colour
+            Rectangle(size=(300, 100),
+                      pos=(300, 200))
+        self.bind(pos=self.update_rectangle,
+                  size=self.update_rectangle)
 
 
-class MyPaintWidget(Widget):
-    def __init__(self, **kwargs):
-        super(MyPaintWidget, self).__init__(**kwargs)
-    pencolor = (1, 0, 0)
-        
+    def update_rectangle(self, instance, value):
+        self.rect.pos = self.pos
+        self.rect.size = self.size
+
     def on_touch_down(self, touch):
-        if not isinstance(touch, HIDMotionEvent):
-            with self.canvas:
-                Color(*self.pencolor, mode='hsv')
-                d = 30.
-                Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))
-                touch.ud['line'] = Line(points=(touch.x, touch.y))
+        super(DrawingWidget, self).on_touch_down(touch)
+
+        with self.canvas:
+            Color(random(), random(), random())
+            self.line = Line(points=[touch.pos[0], touch.pos[1]], width=2)
 
     def on_touch_move(self, touch):
-        if not isinstance(touch, HIDMotionEvent):
-            touch.ud['line'].points += [touch.x, touch.y]
+        self.line.points = self.line.points + [touch.pos[0], touch.pos[1]]
 
 
-class MyPaintApp(App):
+class DrawingApp(App):
 
     def build(self):
-        parent = Widget()
-        self.painter = MyPaintWidget()
-        clearbtn = Button(text='Clear')
-        clearbtn.bind(on_release=self.clear_canvas)
-        parent.add_widget(self.painter)
-        parent.add_widget(clearbtn)
-        return parent
+        root_widget = DrawingWidget()
+        return root_widget
 
-    def clear_canvas(self, obj):
-        self.painter.canvas.clear()
-
-
-if __name__ == '__main__':
-    MyPaintApp().run()
+DrawingApp().run()

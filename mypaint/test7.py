@@ -28,8 +28,6 @@ class MyPaintWidget(Widget):
         bg = MyBackground()
         self.add_widget(bg)
 
-        self.bind(mynum=bg.setter('mynum'))
-
     def on_touch_down(self, touch):
         if not isinstance(touch, HIDMotionEvent):
             with self.canvas:
