@@ -99,15 +99,15 @@ class MyPaintApp(App):
 
     def build(self):
         parent = Widget()
-        self.fname = 'fruit.jpg'
+        self.fname = 'sunflower.jpeg'
         f = io.imread(self.fname)
         ratio_width_vs_height = f.shape[1] / f.shape[0]
-        width = (Window.size[1] - 200) * ratio_width_vs_height
-        height = Window.size[1]-200
+#         width = (Window.size[1] - 200) * ratio_width_vs_height
+#         height = Window.size[1]-200
 #        width = Window.size[0]
 #        height = Window.size[1] - 200
 
-        self.painter = MyPaintWidget(size=(width, height), fpath=self.fname)
+        self.painter = MyPaintWidget(size=(Window.size[1], Window.size[0]), fpath=self.fname)
 
         parent.add_widget(self.painter)
 
